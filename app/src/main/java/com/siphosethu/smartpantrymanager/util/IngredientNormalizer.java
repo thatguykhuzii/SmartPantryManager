@@ -19,28 +19,35 @@ public final class IngredientNormalizer {
         aliases.put("carrots", "carrot");
         aliases.put("bananas", "banana");
         aliases.put("apples", "apple");
-        aliases.put("lemons", "lemon");
         aliases.put("peppers", "pepper");
+        aliases.put("bell peppers", "bell pepper");
 
         ALIASES = Collections.unmodifiableMap(aliases);
     }
 
     private IngredientNormalizer() {
-        // Utility class: no objects need to be created.
+        // Utility class: no instances are needed.
     }
 
     public static String normalize(String input) {
         if (input == null) {
-            return "";
+            throw new IllegalArgumentException(
+                    "Ingredient name is required."
+            );
         }
 
-        String cleaned = input
-                .trim()
+        String name = input.trim()
                 .toLowerCase(Locale.ROOT)
                 .replaceAll("\\s+", " ");
 
-        String canonicalName = ALIASES.get(cleaned);
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Ingredient name cannot be blank."
+            );
+        }
 
-        return canonicalName != null ? canonicalName : cleaned;
+        String canonicalName = ALIASES.get(name);
+
+        return canonicalName != null ? canonicalName : name;
     }
 }
