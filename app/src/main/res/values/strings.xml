@@ -9,4 +9,9 @@
     <string name="pantry_setup_status">Pantry screen setup in progress.</string>
 
     <string name="empty_pantry">Your pantry is empty. Add an ingredient to get started.</string>
+    <string name="pantry_loading">Loading pantry…</string>
+
+    <string name="pantry_load_error">Could not load your pantry. Tap this message to retry.</string>
+
+    <string name="pantry_item_count">Pantry items: %1$d</string>
 </resources>
