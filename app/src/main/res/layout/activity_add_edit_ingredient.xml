@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ingredientFormRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/textIngredientFormTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/ingredient_form_add_title"
+            android:textSize="26sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:labelFor="@id/editIngredientName"
+            android:text="@string/ingredient_name_label"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/editIngredientName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/ingredient_name_hint"
+            android:imeOptions="actionNext"
+            android:inputType="textCapWords"
+            android:maxLength="80"
+            android:maxLines="1"
+            android:minHeight="48dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:labelFor="@id/editIngredientQuantity"
+            android:text="@string/ingredient_quantity_label"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/editIngredientQuantity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/ingredient_quantity_hint"
+            android:imeOptions="actionDone"
+            android:inputType="numberDecimal"
+            android:maxLength="18"
+            android:maxLines="1"
+            android:minHeight="48dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:labelFor="@id/spinnerIngredientUnit"
+            android:text="@string/ingredient_unit_label"
+            android:textSize="16sp" />
+
+        <Spinner
+            android:id="@+id/spinnerIngredientUnit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:entries="@array/pantry_units"
+            android:minHeight="48dp"
+            android:spinnerMode="dropdown" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/ingredient_unit_help"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/textIngredientFormStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:accessibilityLiveRegion="polite"
+            android:textSize="16sp"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/buttonSaveIngredient"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:minHeight="48dp"
+            android:text="@string/save_ingredient" />
+
+        <Button
+            android:id="@+id/buttonCancelIngredient"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:minHeight="48dp"
+            android:text="@string/cancel_ingredient" />
+
+    </LinearLayout>
+
+</ScrollView>

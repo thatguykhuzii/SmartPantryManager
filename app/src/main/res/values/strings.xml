@@ -14,4 +14,26 @@
     <string name="pantry_load_error">Could not load your pantry. Tap this message to retry.</string>
 
     <string name="pantry_item_count">Pantry items: %1$d</string>
+    <string name="ingredient_form_add_title">Add ingredient</string>
+    <string name="ingredient_form_edit_title">Edit ingredient</string>
+
+    <string name="ingredient_name_label">Ingredient name</string>
+    <string name="ingredient_name_hint">For example: rice or tomatoes</string>
+
+    <string name="ingredient_quantity_label">Quantity</string>
+    <string name="ingredient_quantity_hint">For example: 500 or 1.5</string>
+
+    <string name="ingredient_unit_label">Unit</string>
+    <string name="ingredient_unit_help">Use g or kg for mass, ml or l for volume, and piece for counted items.</string>
+
+    <string name="save_ingredient">Save ingredient</string>
+    <string name="cancel_ingredient">Cancel</string>
+
+    <string-array name="pantry_units">
+        <item>g</item>
+        <item>kg</item>
+        <item>ml</item>
+        <item>l</item>
+        <item>piece</item>
+    </string-array>
 </resources>
