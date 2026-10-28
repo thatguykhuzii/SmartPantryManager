@@ -40,7 +40,7 @@ normalisation and supported unit conversions.
 - Java for application code.
 - XML layouts for the interface.
 - SQLite through SQLiteOpenHelper for persistent application data.
-- RecyclerView with custom adapters for dynamic lists.
+- ListView with a custom adapter for the pantry list.
 - Git and GitHub for version control.
 
 ## Database choice
