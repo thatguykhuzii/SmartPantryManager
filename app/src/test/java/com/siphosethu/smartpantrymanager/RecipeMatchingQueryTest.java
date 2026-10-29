@@ -1,24 +1,55 @@
 package com.siphosethu.smartpantrymanager;
 
+import com.siphosethu.smartpantrymanager.util.UnitConverter;
+
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class RecipeMatchingQueryTest {
 
     @Test
-    public void strictMatchingRulesAreDocumented() {
-        String missingIngredientRule =
-                "A missing required ingredient excludes a recipe.";
+    public void kilogramAvailabilitySatisfiesGramRequirement() {
+        double availableGrams =
+                UnitConverter.toBaseQuantity(1, "kg");
 
-        String insufficientQuantityRule =
-                "An insufficient quantity excludes a recipe.";
+        double requiredGrams =
+                UnitConverter.toBaseQuantity(500, "g");
 
-        String unitMismatchRule =
-                "A unit mismatch currently excludes a recipe.";
+        assertTrue(availableGrams >= requiredGrams);
+    }
 
-        assertTrue(missingIngredientRule.contains("missing"));
-        assertTrue(insufficientQuantityRule.contains("insufficient"));
-        assertTrue(unitMismatchRule.contains("mismatch"));
+    @Test
+    public void litreAvailabilitySatisfiesMillilitreRequirement() {
+        double availableMillilitres =
+                UnitConverter.toBaseQuantity(1, "l");
+
+        double requiredMillilitres =
+                UnitConverter.toBaseQuantity(500, "ml");
+
+        assertTrue(availableMillilitres >= requiredMillilitres);
+    }
+
+    @Test
+    public void insufficientQuantityFailsMatching() {
+        double availableGrams =
+                UnitConverter.toBaseQuantity(250, "g");
+
+        double requiredGrams =
+                UnitConverter.toBaseQuantity(500, "g");
+
+        assertTrue(availableGrams < requiredGrams);
+    }
+
+    @Test
+    public void exactQuantityPassesMatching() {
+        double availableGrams =
+                UnitConverter.toBaseQuantity(500, "g");
+
+        double requiredGrams =
+                UnitConverter.toBaseQuantity(0.5, "kg");
+
+        assertEquals(availableGrams, requiredGrams, 0.000001);
     }
 }

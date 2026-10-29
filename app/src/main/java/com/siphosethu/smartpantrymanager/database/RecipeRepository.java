@@ -164,42 +164,135 @@ public class RecipeRepository implements AutoCloseable {
 
         List<Recipe> qualifyingRecipes = new ArrayList<>();
 
-        String sql =
-                "SELECT r.id, r.name, r.preparation_steps " +
-                        "FROM " + DatabaseHelper.TABLE_RECIPES + " r " +
-                        "WHERE NOT EXISTS (" +
-                        "SELECT 1 " +
-                        "FROM " + DatabaseHelper.TABLE_RECIPE_INGREDIENTS +
-                        " ri " +
-                        "LEFT JOIN " + DatabaseHelper.TABLE_PANTRY_ITEMS +
-                        " p " +
-                        "ON p.ingredient_id = ri.ingredient_id " +
-                        "WHERE ri.recipe_id = r.id " +
-                        "AND (" +
-                        "p.id IS NULL " +
-                        "OR p.quantity < ri.required_quantity " +
-                        "OR p.unit <> ri.unit" +
-                        ")" +
-                        ") " +
-                        "ORDER BY r.name COLLATE NOCASE ASC";
+        Map<Long, Double> availableBaseQuantities =
+                loadPantryBaseQuantities(db);
 
-        try (Cursor cursor = db.rawQuery(sql, null)) {
-            int idColumn = cursor.getColumnIndexOrThrow("id");
-            int nameColumn = cursor.getColumnIndexOrThrow("name");
-            int stepsColumn = cursor.getColumnIndexOrThrow(
-                    "preparation_steps"
-            );
+        String recipeSql =
+                "SELECT id, name, preparation_steps " +
+                        "FROM " + DatabaseHelper.TABLE_RECIPES + " " +
+                        "ORDER BY name COLLATE NOCASE ASC";
 
-            while (cursor.moveToNext()) {
-                qualifyingRecipes.add(new Recipe(
-                        cursor.getLong(idColumn),
-                        cursor.getString(nameColumn),
-                        cursor.getString(stepsColumn)
-                ));
+        try (Cursor recipeCursor = db.rawQuery(recipeSql, null)) {
+            int recipeIdColumn =
+                    recipeCursor.getColumnIndexOrThrow("id");
+
+            int recipeNameColumn =
+                    recipeCursor.getColumnIndexOrThrow("name");
+
+            int recipeStepsColumn =
+                    recipeCursor.getColumnIndexOrThrow(
+                            "preparation_steps"
+                    );
+
+            while (recipeCursor.moveToNext()) {
+                long recipeId =
+                        recipeCursor.getLong(recipeIdColumn);
+
+                if (recipeMatchesPantry(
+                        db,
+                        recipeId,
+                        availableBaseQuantities
+                )) {
+                    qualifyingRecipes.add(new Recipe(
+                            recipeId,
+                            recipeCursor.getString(recipeNameColumn),
+                            recipeCursor.getString(recipeStepsColumn)
+                    ));
+                }
             }
         }
 
         return qualifyingRecipes;
+    }
+
+    private Map<Long, Double> loadPantryBaseQuantities(
+            SQLiteDatabase db
+    ) {
+        Map<Long, Double> pantry = new HashMap<>();
+
+        String sql =
+                "SELECT ingredient_id, quantity, unit " +
+                        "FROM " + DatabaseHelper.TABLE_PANTRY_ITEMS;
+
+        try (Cursor cursor = db.rawQuery(sql, null)) {
+            int ingredientIdColumn =
+                    cursor.getColumnIndexOrThrow("ingredient_id");
+
+            int quantityColumn =
+                    cursor.getColumnIndexOrThrow("quantity");
+
+            int unitColumn =
+                    cursor.getColumnIndexOrThrow("unit");
+
+            while (cursor.moveToNext()) {
+                long ingredientId =
+                        cursor.getLong(ingredientIdColumn);
+
+                double baseQuantity = UnitConverter.toBaseQuantity(
+                        cursor.getDouble(quantityColumn),
+                        cursor.getString(unitColumn)
+                );
+
+                pantry.put(ingredientId, baseQuantity);
+            }
+        }
+
+        return pantry;
+    }
+
+    private boolean recipeMatchesPantry(
+            SQLiteDatabase db,
+            long recipeId,
+            Map<Long, Double> availableBaseQuantities
+    ) {
+        String sql =
+                "SELECT ingredient_id, required_quantity, unit " +
+                        "FROM " + DatabaseHelper.TABLE_RECIPE_INGREDIENTS +
+                        " WHERE recipe_id = ?";
+
+        try (Cursor cursor = db.rawQuery(
+                sql,
+                new String[]{String.valueOf(recipeId)}
+        )) {
+            if (!cursor.moveToFirst()) {
+                // A recipe with no requirements cannot qualify.
+                return false;
+            }
+
+            int ingredientIdColumn =
+                    cursor.getColumnIndexOrThrow("ingredient_id");
+
+            int requiredQuantityColumn =
+                    cursor.getColumnIndexOrThrow("required_quantity");
+
+            int unitColumn =
+                    cursor.getColumnIndexOrThrow("unit");
+
+            do {
+                long ingredientId =
+                        cursor.getLong(ingredientIdColumn);
+
+                if (!availableBaseQuantities.containsKey(ingredientId)) {
+                    return false;
+                }
+
+                double requiredQuantity =
+                        UnitConverter.toBaseQuantity(
+                                cursor.getDouble(requiredQuantityColumn),
+                                cursor.getString(unitColumn)
+                        );
+
+                double availableQuantity =
+                        availableBaseQuantities.get(ingredientId);
+
+                if (availableQuantity < requiredQuantity) {
+                    return false;
+                }
+
+            } while (cursor.moveToNext());
+
+            return true;
+        }
     }
 
     @Override
