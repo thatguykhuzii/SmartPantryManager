@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.TextUtils;
 
 import com.siphosethu.smartpantrymanager.model.Recipe;
 import com.siphosethu.smartpantrymanager.util.UnitConverter;
@@ -293,6 +294,91 @@ public class RecipeRepository implements AutoCloseable {
 
             return true;
         }
+    }
+    public Recipe getRecipeById(long recipeId) {
+        if (recipeId <= 0) {
+            throw new IllegalArgumentException(
+                    "Recipe ID must be greater than zero."
+            );
+        }
+
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+
+        String sql =
+                "SELECT id, name, preparation_steps " +
+                        "FROM " + DatabaseHelper.TABLE_RECIPES + " " +
+                        "WHERE id = ?";
+
+        try (Cursor cursor = db.rawQuery(
+                sql,
+                new String[]{String.valueOf(recipeId)}
+        )) {
+            if (!cursor.moveToFirst()) {
+                return null;
+            }
+
+            return new Recipe(
+                    cursor.getLong(
+                            cursor.getColumnIndexOrThrow("id")
+                    ),
+                    cursor.getString(
+                            cursor.getColumnIndexOrThrow("name")
+                    ),
+                    cursor.getString(
+                            cursor.getColumnIndexOrThrow(
+                                    "preparation_steps"
+                            )
+                    )
+            );
+        }
+    }
+
+    public String getRecipeIngredientsText(long recipeId) {
+        if (recipeId <= 0) {
+            throw new IllegalArgumentException(
+                    "Recipe ID must be greater than zero."
+            );
+        }
+
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+
+        String sql =
+                "SELECT i.canonical_name, " +
+                        "ri.required_quantity, ri.unit " +
+                        "FROM " + DatabaseHelper.TABLE_RECIPE_INGREDIENTS +
+                        " ri " +
+                        "INNER JOIN " + DatabaseHelper.TABLE_INGREDIENTS +
+                        " i ON ri.ingredient_id = i.id " +
+                        "WHERE ri.recipe_id = ? " +
+                        "ORDER BY i.canonical_name COLLATE NOCASE ASC";
+
+        List<String> lines = new ArrayList<>();
+
+        try (Cursor cursor = db.rawQuery(
+                sql,
+                new String[]{String.valueOf(recipeId)}
+        )) {
+            int nameColumn =
+                    cursor.getColumnIndexOrThrow("canonical_name");
+
+            int quantityColumn =
+                    cursor.getColumnIndexOrThrow("required_quantity");
+
+            int unitColumn =
+                    cursor.getColumnIndexOrThrow("unit");
+
+            while (cursor.moveToNext()) {
+                lines.add(
+                        cursor.getString(nameColumn) +
+                                ": " +
+                                cursor.getDouble(quantityColumn) +
+                                " " +
+                                cursor.getString(unitColumn)
+                );
+            }
+        }
+
+        return TextUtils.join("\n", lines);
     }
 
     @Override

@@ -6,6 +6,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Button;
+
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,6 +20,7 @@ import com.siphosethu.smartpantrymanager.adapter.PantryAdapter;
 import com.siphosethu.smartpantrymanager.database.PantryRepository;
 import com.siphosethu.smartpantrymanager.model.PantryItem;
 import com.siphosethu.smartpantrymanager.database.RecipeRepository;
+import com.siphosethu.smartpantrymanager.R;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -109,6 +112,21 @@ public class MainActivity extends AppCompatActivity {
 
             startActivity(intent);
         });
+        Button suggestedRecipesButton = new Button(this);
+        suggestedRecipesButton.setText("Suggested recipes");
+        suggestedRecipesButton.setMinHeight(48);
+
+        suggestedRecipesButton.setOnClickListener(view -> {
+            Intent intent = new Intent(
+                    MainActivity.this,
+                    SuggestedRecipesActivity.class
+            );
+
+            startActivity(intent);
+        });
+
+        ((android.view.ViewGroup) findViewById(R.id.main))
+                .addView(suggestedRecipesButton);
 
         buttonAddIngredient.setEnabled(true);
 
@@ -117,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
                 loadPantry();
             }
         });
+
     }
 
     @Override
