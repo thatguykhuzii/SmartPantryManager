@@ -36,4 +36,13 @@
         <item>l</item>
         <item>piece</item>
     </string-array>
+    <string name="delete_ingredient">Delete ingredient</string>
+
+    <string name="delete_ingredient_confirmation">
+    Delete this pantry item? This will not delete any recipe.
+</string>
+
+    <string name="delete_ingredient_success">Pantry item deleted.</string>
+
+    <string name="delete_ingredient_error">Could not delete this pantry item. Please try again.</string>
 </resources>
