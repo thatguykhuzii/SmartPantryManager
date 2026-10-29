@@ -5,6 +5,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.siphosethu.smartpantrymanager.model.Recipe;
+import com.siphosethu.smartpantrymanager.util.UnitConverter;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -154,6 +158,48 @@ public class RecipeRepository implements AutoCloseable {
                 );
             }
         }
+    }
+    public List<Recipe> getQualifyingRecipes() {
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+
+        List<Recipe> qualifyingRecipes = new ArrayList<>();
+
+        String sql =
+                "SELECT r.id, r.name, r.preparation_steps " +
+                        "FROM " + DatabaseHelper.TABLE_RECIPES + " r " +
+                        "WHERE NOT EXISTS (" +
+                        "SELECT 1 " +
+                        "FROM " + DatabaseHelper.TABLE_RECIPE_INGREDIENTS +
+                        " ri " +
+                        "LEFT JOIN " + DatabaseHelper.TABLE_PANTRY_ITEMS +
+                        " p " +
+                        "ON p.ingredient_id = ri.ingredient_id " +
+                        "WHERE ri.recipe_id = r.id " +
+                        "AND (" +
+                        "p.id IS NULL " +
+                        "OR p.quantity < ri.required_quantity " +
+                        "OR p.unit <> ri.unit" +
+                        ")" +
+                        ") " +
+                        "ORDER BY r.name COLLATE NOCASE ASC";
+
+        try (Cursor cursor = db.rawQuery(sql, null)) {
+            int idColumn = cursor.getColumnIndexOrThrow("id");
+            int nameColumn = cursor.getColumnIndexOrThrow("name");
+            int stepsColumn = cursor.getColumnIndexOrThrow(
+                    "preparation_steps"
+            );
+
+            while (cursor.moveToNext()) {
+                qualifyingRecipes.add(new Recipe(
+                        cursor.getLong(idColumn),
+                        cursor.getString(nameColumn),
+                        cursor.getString(stepsColumn)
+                ));
+            }
+        }
+
+        return qualifyingRecipes;
     }
 
     @Override
