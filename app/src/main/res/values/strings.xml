@@ -74,4 +74,15 @@
 </string>
 
     <string name="back_to_pantry">Back to pantry</string>
+    <string name="settings_title">Settings</string>
+
+    <string name="settings_subtitle">Choose how your pantry list is displayed.</string>
+
+    <string name="sort_ascending">Sort pantry from A to Z</string>
+
+    <string name="sort_descending">Sort pantry from Z to A</string>
+
+    <string name="settings_saved">Settings saved.</string>
+
+    <string name="back_to_pantry_from_settings">Back to pantry</string>
 </resources>

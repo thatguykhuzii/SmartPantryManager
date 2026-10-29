@@ -124,7 +124,21 @@ public class MainActivity extends AppCompatActivity {
 
             startActivity(intent);
         });
+        Button settingsButton = new Button(this);
+        settingsButton.setText("Settings");
+        settingsButton.setMinHeight(48);
 
+        settingsButton.setOnClickListener(view -> {
+            Intent intent = new Intent(
+                    MainActivity.this,
+                    SettingsActivity.class
+            );
+
+            startActivity(intent);
+        });
+
+        ((android.view.ViewGroup) findViewById(R.id.main))
+                .addView(settingsButton, 3);
         ((android.view.ViewGroup) findViewById(R.id.main))
                 .addView(suggestedRecipesButton);
 
@@ -163,8 +177,11 @@ public class MainActivity extends AppCompatActivity {
             try {
                 recipeRepository.ensureRecipesAreSeeded();
                 // Use ascending order until Settings is implemented.
+                boolean sortAscending =
+                        SettingsActivity.readSortAscending(this);
+
                 List<PantryItem> items =
-                        pantryRepository.getAllPantryItems(true);
+                        pantryRepository.getAllPantryItems(sortAscending);
 
                 runOnUiThread(() -> {
                     if (isFinishing() || isDestroyed()) {
