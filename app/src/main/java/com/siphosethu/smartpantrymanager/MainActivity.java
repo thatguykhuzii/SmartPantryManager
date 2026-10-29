@@ -1,5 +1,6 @@
 package com.siphosethu.smartpantrymanager;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private ListView listPantry;
     private TextView textEmptyPantry;
     private TextView textPantryStatus;
+    private View buttonAddIngredient;
 
     private boolean loading;
     private boolean loadFailed;
@@ -72,6 +74,18 @@ public class MainActivity extends AppCompatActivity {
 
         pantryAdapter = new PantryAdapter(this);
         listPantry.setAdapter(pantryAdapter);
+        buttonAddIngredient = findViewById(R.id.buttonAddIngredient);
+
+        buttonAddIngredient.setOnClickListener(view -> {
+            Intent intent = new Intent(
+                    MainActivity.this,
+                    AddEditIngredientActivity.class
+            );
+
+            startActivity(intent);
+        });
+
+        buttonAddIngredient.setEnabled(true);
 
         textPantryStatus.setOnClickListener(view -> {
             if (loadFailed && !loading) {
